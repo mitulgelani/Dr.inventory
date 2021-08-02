@@ -23,9 +23,10 @@ class _SignupscreenState extends State<Signupscreen> {
   void handleSignUp() {
     if (formkey.currentState.validate()) {
       formkey.currentState.save();
-      signUp(email.trim(), password, context).then((user) async {
+      signUp(email.trim(), password, context).then((user) {
         if (user != null) {
-          await db.collection('users').document(user.uid).setData({
+         
+          db.collection('userdata').document(user.uid).setData({
             'name': name,
             'email': email,
             'uid': user.uid,
@@ -137,6 +138,7 @@ class _SignupscreenState extends State<Signupscreen> {
                         child: SizedBox(
                           height: 50,
                           width: 100,
+                          // ignore: deprecated_member_use
                           child: RaisedButton(
                             color: Colors.blue,
                             onPressed: handleSignUp,

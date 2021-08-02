@@ -31,8 +31,8 @@ FirebaseAuth auth = FirebaseAuth.instance;
       ],
     ),
   );
-} */
-
+}
+ */
 Future<FirebaseUser> signIn(
     String email, String password, BuildContext context) async {
   try {
@@ -45,22 +45,22 @@ Future<FirebaseUser> signIn(
     print(e.code);
     switch (e.code) {
       case 'ERROR_INVALID_EMAIL':
-        // showErrDialog(context, e.code);
+     //   showErrDialog(context, e.code);
         break;
       case 'ERROR_WRONG_PASSWORD':
-        // showErrDialog(context, e.code);
+      //  showErrDialog(context, e.code);
         break;
       case 'ERROR_USER_NOT_FOUND':
-        //  showErrDialog(context, e.code);
+       // showErrDialog(context, e.code);
         break;
       case 'ERROR_USER_DISABLED':
-        // showErrDialog(context, e.code);
+     //  showErrDialog(context, e.code);
         break;
       case 'ERROR_TOO_MANY_REQUESTS':
-        //showErrDialog(context, e.code);
+      //  showErrDialog(context, e.code);
         break;
       case 'ERROR_OPERATION_NOT_ALLOWED':
-        // showErrDialog(context, e.code);
+       // showErrDialog(context, e.code);
         break;
     }
     return Future.value(null);
@@ -77,13 +77,13 @@ Future<FirebaseUser> signUp(
   } catch (error) {
     switch (error.code) {
       case 'ERROR_EMAIL_ALREADY_IN_USE':
-        // showErrDialog(context, "Email Already Exists");
+       // showErrDialog(context, "Email Already Exists");
         break;
       case 'ERROR_INVALID_EMAIL':
-        // showErrDialog(context, "Invalid Email Address");
+      //  showErrDialog(context, "Invalid Email Address");
         break;
       case 'ERROR_WEAK_PASSWORD':
-        // showErrDialog(context, "Please Choose a stronger password");
+      //  showErrDialog(context, "Please Choose a stronger password");
         break;
     }
     return Future.value(null);

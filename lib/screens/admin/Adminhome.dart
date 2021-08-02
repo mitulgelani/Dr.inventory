@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auths/pages/loginScreen.dart';
+import 'package:flutter_auths/pages/About.dart';
+import 'package:flutter_auths/pages/Loginscreen.dart';
+import 'package:flutter_auths/screens/admin/Adminportal.dart';
 import 'package:flutter_auths/screens/admin/Adminprofile.dart';
+import 'package:flutter_auths/screens/admin/History.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
@@ -9,26 +12,33 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
 class Adminhome extends StatefulWidget {
   final FirebaseUser user;
+  final int deletebillflag;
 
-  const Adminhome({Key key, this.user}) : super(key: key);
+  const Adminhome({Key key, this.user, this.deletebillflag}) : super(key: key);
   @override
-  _AdminhomeState createState() => _AdminhomeState(user);
+  _AdminhomeState createState() => _AdminhomeState(user, deletebillflag);
 }
 
 class _AdminhomeState extends State<Adminhome> {
   final PageController _pageController = PageController();
   int currentIndex = 0;
   String name, email;
-  _AdminhomeState(this.user);
+  final int deletebillflag;
+
+  _AdminhomeState(this.user, this.deletebillflag);
   final db = Firestore.instance;
   Future<DocumentSnapshot> document;
+  String tmp;
+
   Future<void> getdata() async {
-    document = Firestore.instance.collection('users').document(user.uid).get();
+    document =
+        Firestore.instance.collection('userdata').document(user.uid).get();
     document.then<dynamic>((DocumentSnapshot snapshot) async {
       if (mounted) {
         setState(() {
           name = snapshot.data['name'];
           email = user.email;
+          tmp = name[0];
         });
       }
     });
@@ -47,10 +57,22 @@ class _AdminhomeState extends State<Adminhome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => History(uid: user.uid)));
+            },
+            child: Icon(
+              Icons.list_alt_rounded,
+            ),
+          ),
+          SizedBox(width: 20)
+        ],
         //automaticallyImplyLeading: false,
-        backgroundColor: Colors.blue[300],
+        backgroundColor: Colors.grey,
         title: Text(
-          "Placement App-Admin",
+          "Dr-Inventory",
           style: GoogleFonts.pattaya(fontSize: 30),
         ),
         centerTitle: true,
@@ -75,13 +97,28 @@ class _AdminhomeState extends State<Adminhome> {
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Text(
-                "S",
+                "$tmp",
                 style: TextStyle(
+                  fontSize: 27,
                   color: Colors.red,
                 ),
               ),
             ),
           ),
+          /*  ListTile(
+            title: Text(
+              "Generate PDF",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: Colors.white,
+              ),
+            ),
+            trailing: Icon(
+              Icons.analytics_outlined,
+              color: Colors.blueAccent,
+            ),
+            onTap: () {},
+          ), */
           ListTile(
             title: Text(
               "About",
@@ -94,7 +131,10 @@ class _AdminhomeState extends State<Adminhome> {
               Icons.info,
               color: Colors.blueAccent,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => About()));
+            },
           ),
           ListTile(
               title: Text(
@@ -112,6 +152,22 @@ class _AdminhomeState extends State<Adminhome> {
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => Loginscreen()));
               }),
+          /* ListTile(
+              title: Text(
+                "Student Section",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.white,
+                ),
+              ),
+              trailing: Icon(
+                Icons.logout,
+                color: Colors.blueAccent,
+              ),
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => Studenthome()));
+              }),*/
           InkWell(
             borderRadius: BorderRadius.circular(500),
             onTap: () {
@@ -125,11 +181,16 @@ class _AdminhomeState extends State<Adminhome> {
           ),
         ],
       )),
-      body: PageView(
+      body: Stack(children: [
+        AdminPortal(
+          user: user,
+        ),
+      ]),
+      /* PageView(
         controller: _pageController,
         children: <Widget>[
-          //Adminhome(),
-          //Status(),
+          AdminPortal(),
+          //  AdminPortal(),
           Adminprofile(),
         ],
         onPageChanged: (pageIndex) {
@@ -137,8 +198,8 @@ class _AdminhomeState extends State<Adminhome> {
             currentIndex = pageIndex;
           });
         },
-      ),
-      bottomNavigationBar: BottomNavyBar(
+      ), */
+      /* bottomNavigationBar: BottomNavyBar(
         animationDuration: Duration(milliseconds: 200),
         backgroundColor: Colors.white,
         curve: Curves.easeInCubic,
@@ -169,8 +230,7 @@ class _AdminhomeState extends State<Adminhome> {
             inactiveColor: Colors.black,
           ),
         ],
-      ),
+      ), */
     );
-    
   }
 }

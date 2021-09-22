@@ -8,7 +8,6 @@ import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import '../../main.dart';
 
 class AdminPortal extends StatefulWidget {
@@ -39,10 +38,11 @@ class _AdminPortalState extends State<AdminPortal> {
   TextEditingController _searchQueryController = TextEditingController();
   TextEditingController mrname = TextEditingController();
   TextEditingController quan = TextEditingController();
+  TextEditingController exd = TextEditingController();
   String brandforbill, uuidforbill;
   bool _isSearching = false, _show = false;
   String searchQuery = "Search query";
-  String totalquan;
+  List<Map<String, dynamic>> totalexq = List<Map<String, dynamic>>();
 
   Widget _buildSearchField() {
     return TextField(
@@ -62,7 +62,7 @@ class _AdminPortalState extends State<AdminPortal> {
     super.initState();
     getdata();
     setState(() {
-      totalquan;
+      totalexq;
     });
     if (deletebillflag == 1) {
       billlist.clear();
@@ -96,9 +96,6 @@ class _AdminPortalState extends State<AdminPortal> {
   }
 
   void _startSearch() {
-    /*  ModalRoute.of(context)
-        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching)); */
-
     setState(() {
       _isSearching = true;
     });
@@ -115,7 +112,6 @@ class _AdminPortalState extends State<AdminPortal> {
 
   void _stopSearching() {
     _clearSearchQuery();
-
     setState(() {
       _isSearching = false;
       postlist();
@@ -133,25 +129,35 @@ class _AdminPortalState extends State<AdminPortal> {
     finallist.clear();
 
     for (var item in doc) {
+      int searchflag = 0;
       List<String> dateseprate = List<String>();
       List<String> datesearch = List<String>();
-      dateseprate = item['date'].split('-');
+
       datesearch = _searchQueryController.text.split('-');
 
-      int searchflag = 0;
-      if (datesearch.length > 2) {
-        if (int.parse(dateseprate[2]) == int.parse(datesearch[2])) {
-          if (int.parse(dateseprate[1]) == int.parse(datesearch[1])) {
-            if (int.parse(dateseprate[0]) == int.parse(datesearch[0])) {
-              searchflag = 1;
-            } else if (int.parse(dateseprate[0]) < int.parse(datesearch[0])) {
+      if (datesearch.length > 1) {
+        for (int z = 0; z < item['date'].length; z++) {
+          for (var entry in item['date'][z].entries) {
+            print('+++++++++');
+            print('${entry.key}');
+            print('+++++++++');
+
+            dateseprate = entry.key.split('-');
+
+            print('2+++++++++');
+            print(dateseprate);
+            print('+++++++++');
+
+            if (int.parse(dateseprate[1]) == int.parse(datesearch[1])) {
+              if (int.parse(dateseprate[0]) == int.parse(datesearch[0])) {
+                searchflag = 1;
+              } else if (int.parse(dateseprate[0]) < int.parse(datesearch[0])) {
+                searchflag = 1;
+              }
+            } else if (int.parse(dateseprate[1]) < int.parse(datesearch[1])) {
               searchflag = 1;
             }
-          } else if (int.parse(dateseprate[1]) < int.parse(datesearch[1])) {
-            searchflag = 1;
           }
-        } else if (int.parse(dateseprate[2]) < int.parse(datesearch[2])) {
-          searchflag = 1;
         }
       }
 
@@ -164,7 +170,6 @@ class _AdminPortalState extends State<AdminPortal> {
           item['mrnumber'].contains(_searchQueryController.text) ||
           item['mrp'].contains(_searchQueryController.text) ||
           item['place'].toLowerCase().contains(_searchQueryController.text) ||
-          item['quantity'].contains(_searchQueryController.text) ||
           item['strength']
               .toLowerCase()
               .contains(_searchQueryController.text)) {
@@ -174,6 +179,7 @@ class _AdminPortalState extends State<AdminPortal> {
         tmp['brand'] = item['brand'];
         tmp['company'] = item['company'];
         tmp['contain'] = item['contain'];
+
         tmp['date'] = item['date'];
         tmp['quantity'] = item['quantity'];
         tmp['form'] = item['form'];
@@ -194,7 +200,6 @@ class _AdminPortalState extends State<AdminPortal> {
         .collection('posts')
         .getDocuments();
     doc = result.documents;
-
     return doc;
   }
 
@@ -204,82 +209,128 @@ class _AdminPortalState extends State<AdminPortal> {
     // set up the button
     AlertDialog alert = AlertDialog(
       backgroundColor: Colors.grey,
-      title: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            billlist.length > 0
-                ? Container()
-                : Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    child: TextFormField(
-                      controller: mrname,
-                      cursorColor: Colors.white,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                      decoration: new InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.person,
-                          color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0))),
+      content: Container(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                billlist.length > 0
+                    ? Container()
+                    : Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 10.0),
+                        child: TextFormField(
+                          controller: mrname,
+                          cursorColor: Colors.white,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                          decoration: new InputDecoration(
+                            prefixIcon: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                            ),
+                            labelText: "MR. Name",
+                            fillColor: Colors.black,
+                            border: new OutlineInputBorder(
+                              borderRadius: new BorderRadius.circular(25.0),
+                              borderSide: new BorderSide(),
+                            ),
+                            //fillColor: Colors.green
+                          ),
+                          validator: (val) {
+                            if (val.length == 0) {
+                              return "Cannot be empty";
+                            } else {
+                              return null;
+                            }
+                          },
+                          keyboardType: TextInputType.multiline,
                         ),
-                        labelText: "MR. Name",
-                        fillColor: Colors.black,
-                        border: new OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(25.0),
-                          borderSide: new BorderSide(),
-                        ),
-                        //fillColor: Colors.green
                       ),
-                      validator: (val) {
-                        if (val.length == 0) {
-                          return "Cannot be empty";
-                        } else {
-                          return null;
-                        }
-                      },
-                      keyboardType: TextInputType.multiline,
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  child: TextFormField(
+                    controller: exd,
+                    cursorColor: Colors.white,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
                     ),
+                    decoration: new InputDecoration(
+                      prefixIcon: const Icon(
+                        Icons.calendar_today,
+                        color: Colors.white,
+                      ),
+                      labelText: "EX.  DATE",
+                      hintText: 'MM-YY',
+                      fillColor: Colors.white,
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: new BorderSide(color: Colors.amber),
+                      ),
+                      //fillColor: Colors.green
+                    ),
+                    validator: (val) {
+                      if (val.length == 0) {
+                        return "Cannot be empty";
+                      } else {
+                        return null;
+                      }
+                    },
+                    keyboardType: TextInputType.number,
                   ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-              child: TextFormField(
-                controller: quan,
-                cursorColor: Colors.white,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
                 ),
-                decoration: new InputDecoration(
-                  prefixIcon: const Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                  child: TextFormField(
+                    controller: quan,
+                    cursorColor: Colors.white,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                    decoration: new InputDecoration(
+                      prefixIcon: const Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                      ),
+                      labelText: "QUANTITY",
+                      fillColor: Colors.white,
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(25.0),
+                        borderSide: new BorderSide(color: Colors.amber),
+                      ),
+                      //fillColor: Colors.green
+                    ),
+                    validator: (val) {
+                      if (val.length == 0) {
+                        return "Cannot be empty";
+                      } else {
+                        return null;
+                      }
+                    },
+                    keyboardType: TextInputType.number,
                   ),
-                  labelText: "QUANTITY",
-                  fillColor: Colors.white,
-                  border: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(25.0),
-                    borderSide: new BorderSide(color: Colors.amber),
-                  ),
-                  //fillColor: Colors.green
                 ),
-                validator: (val) {
-                  if (val.length == 0) {
-                    return "Cannot be empty";
-                  } else {
-                    return null;
-                  }
-                },
-                keyboardType: TextInputType.number,
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Text('\t\t\t\t\tEx.Date : Quantity',
+                      style: TextStyle(color: Colors.white, fontSize: 20)),
+                ),
+                for (int i = 0; i < totalexq.length; i++)
+                  for (String key in totalexq[i].keys)
+                    Text(' ${key} : ${totalexq[i][key]}',
+                        style: TextStyle(color: Colors.white, fontSize: 20)),
+              ],
             ),
-            Text(
-              'Total Quantity : $totalquan',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ],
+          ),
         ),
       ),
       actions: [
@@ -295,15 +346,17 @@ class _AdminPortalState extends State<AdminPortal> {
                   DateTime selectedDate = DateTime.now();
                   final DateFormat formatter = DateFormat('dd-MM-yyyy');
                   final String formatted = formatter.format(selectedDate);
-
                   Map<String, dynamic> tmp = Map<String, dynamic>();
                   tmp['mrname'] = mrname.text;
+                  tmp['exdate'] = exd.text;
                   tmp['quantity'] = quan.text;
                   tmp['brand'] = brandforbill;
                   tmp['uuid'] = uuidforbill;
                   tmp['date'] = formatted;
                   billlist.add(tmp);
                   quan.clear();
+                  print(' adminportal :-- ');
+                  print(billlist);
                   if (billlist.length == 0) mrname.clear();
                   Navigator.of(context).pop();
                 }
@@ -343,7 +396,7 @@ class _AdminPortalState extends State<AdminPortal> {
             .getDocuments();
         setState(() {
           doc = result.documents;
-          totalquan;
+          totalexq;
         });
         return;
       },
@@ -395,7 +448,8 @@ class _AdminPortalState extends State<AdminPortal> {
                       setState(() {
                         brandforbill = finallist[index]['brand'];
                         uuidforbill = finallist[index]['uuid'];
-                        totalquan = finallist[index]['quantity'];
+                        totalexq = List.from(finallist[index]['date']);
+                        //  print('${finallist[index]['date']}');
                       });
                       showAlertDialog(context);
                     },
@@ -453,7 +507,7 @@ class _AdminPortalState extends State<AdminPortal> {
                                 Center(
                                   child: Container(
                                     child:
-                                        Text('${finallist[index]['brand']}\n',
+                                        Text('${finallist[index]["brand"]}\n',
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.righteous(
                                               textStyle: TextStyle(

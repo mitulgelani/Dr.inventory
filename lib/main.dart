@@ -3,7 +3,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auths/pages/Loginscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -123,6 +123,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     actions: <Widget>[
+                      // ignore: deprecated_member_use
                       FlatButton(
                         onPressed: () {
                           Navigator.of(context).pop(true);

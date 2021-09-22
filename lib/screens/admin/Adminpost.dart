@@ -25,12 +25,16 @@ class _AdminPostState extends State<AdminPost> {
   final db = Firestore.instance;
   int updatedateflag = 0;
   int i;
+  // ignore: deprecated_member_use
+  List<Map<String, String>> exq = List<Map<String, String>>();
   Map<String, String> bl = HashMap<String, String>();
   Map<String, String> sl = HashMap<String, String>();
   TextEditingController bn = TextEditingController();
   TextEditingController cn = TextEditingController();
   TextEditingController sn = TextEditingController();
   TextEditingController compn = TextEditingController();
+  TextEditingController exc = TextEditingController();
+  TextEditingController quanc = TextEditingController();
   TextEditingController mrpn = TextEditingController();
   TextEditingController mrname = TextEditingController();
   TextEditingController mrnum = TextEditingController();
@@ -47,7 +51,9 @@ class _AdminPostState extends State<AdminPost> {
   String date;
   DateTime selectedDate = DateTime.now();
   Map<String, dynamic> list;
+  int exddatelength;
   Map<String, dynamic> data = HashMap<String, dynamic>();
+  List<Map<String, dynamic>> exdateq = List<HashMap<String, dynamic>>();
   final FirebaseUser user;
   _AdminPostState(this.list, this.user);
 
@@ -83,8 +89,8 @@ class _AdminPostState extends State<AdminPost> {
     data['mrp'] = mrpn.text;
     data['mrname'] = mrname.text;
     data['mrnumber'] = mrnum.text;
-    data['date'] = date;
-    data['quantity'] = quan.text;
+    data['date'] = exq;
+    // data['quantity'] = quan.text;
     data['place'] = placen.text;
 
     if (url1 != null)
@@ -138,7 +144,7 @@ class _AdminPostState extends State<AdminPost> {
     print('@@@@///// URL1 image url ${data['cimage']} ${url1}');
     // ignore: deprecated_member_use
     List<String> slist = List<String>();
-    // ignore: deprecated_member_use
+
     List<String> blist = List<String>();
     data['brand'] = bn.text;
     data['contain'] = cn.text;
@@ -156,10 +162,9 @@ class _AdminPostState extends State<AdminPost> {
     data['mrp'] = mrpn.text;
     data['mrname'] = mrname.text;
     data['mrnumber'] = mrnum.text;
-    data['date'] = formatted;
-    data['quantity'] = quan.text.toString();
+    data['date'] = exq;
+    // data['quantity'] = quan.text.toString();
     data['place'] = placen.text;
-
     print('URL:------- ${data['cimage']} ${url1}');
   }
 
@@ -424,6 +429,7 @@ class _AdminPostState extends State<AdminPost> {
 
   initState() {
     super.initState();
+    
     i = 0;
     if (list != null) {
       setState(() {
@@ -438,7 +444,14 @@ class _AdminPostState extends State<AdminPost> {
       mrnum.text = list['mrnumber'];
       quan.text = list['quantity'];
       placen.text = list['place'];
-      date = list['date'];
+      exdateq = List.from(list['date']);
+      exddatelength = exdateq.length;
+      print('9999999999999');
+      print(exdateq[0]);
+      // date = list['date'];
+
+      //  for (int i = 0; i < len; i++) print(exdateq[i]);
+
       updateflag = 1;
     }
   }
@@ -555,14 +568,10 @@ class _AdminPostState extends State<AdminPost> {
                       ),
                     ),
 
-                    /////////////////////////////////
-
                     SizedBox(height: 30),
                     //Branch(),
                     form(),
-
                     SizedBox(height: 10),
-
                     Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: 10.0, vertical: 10.0),
@@ -765,8 +774,8 @@ class _AdminPostState extends State<AdminPost> {
                                         })),
                               ])),
 
-                    SizedBox(height: 30),
-                    Text('Expiry Date:',
+                    // SizedBox(height: 30),
+                    /*   Text('Expiry Date:',
                         style: TextStyle(
                             fontSize: 25,
                             color: Colors.grey,
@@ -788,6 +797,7 @@ class _AdminPostState extends State<AdminPost> {
                                 fontWeight: FontWeight.bold),
                           ),
                     SizedBox(height: 15),
+                    // ignore: deprecated_member_use
                     RaisedButton(
                       textColor: Colors.white,
                       color: Colors.green,
@@ -804,38 +814,107 @@ class _AdminPostState extends State<AdminPost> {
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(30.0),
                       ),
-                    ),
-
-                    SizedBox(height: 30),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 10.0),
-                      child: TextFormField(
-                        controller: quan,
-                        cursorColor: Colors.white,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                        decoration: new InputDecoration(
-                          labelText: "QUANTITY",
-                          fillColor: Colors.white,
-                          border: new OutlineInputBorder(
-                            borderRadius: new BorderRadius.circular(25.0),
-                            borderSide: new BorderSide(),
+                    ), */
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                                controller: exc,
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(
+                                    fontSize: 25, color: Colors.white),
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    labelText: ' \t\t\t\t Ex. Date',
+                                    hintText: '\t\t\tmm-yyyy')),
                           ),
-                          //fillColor: Colors.green
                         ),
-                        validator: (val) {
-                          if (val.length == 0) {
-                            return "quantity Cannot be empty";
-                          } else {
-                            return null;
-                          }
-                        },
-                        keyboardType: TextInputType.number,
-                      ),
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            height: 50,
+                            width: 20,
+                            // ignore: deprecated_member_use
+                            child: RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        new BorderRadius.circular(80.0)),
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            ' Quantity ',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 25.0,
+                                            ),
+                                          ),
+                                          content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                TextFormField(
+                                                  controller: quanc,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration:
+                                                      new InputDecoration(
+                                                    labelText: "Quantity",
+                                                    fillColor: Colors.white,
+                                                    border:
+                                                        new OutlineInputBorder(
+                                                      borderRadius:
+                                                          new BorderRadius
+                                                              .circular(25.0),
+                                                      borderSide:
+                                                          new BorderSide(),
+                                                    ),
+                                                    //fillColor: Colors.green
+                                                  ),
+                                                  validator: (val) {
+                                                    if (val.length == 0) {
+                                                      return "Field cannot be empty";
+                                                    } else {
+                                                      return null;
+                                                    }
+                                                  },
+                                                ),
+                                                // ignore: deprecated_member_use
+                                                RaisedButton(
+                                                    child: Text('SUBMIT'),
+                                                    onPressed: () {
+                                                      exq.add({
+                                                        '${exc.text}':
+                                                            '${quanc.text}'
+                                                      });
+                                                      data['date'] = exq;
+                                                      print(exq);
+                                                      exc.clear();
+                                                      quanc.clear();
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    }),
+                                              ]),
+                                        );
+                                      });
+                                },
+                                child: Icon(Icons.add)),
+                          ),
+                        )
+                      ],
                     ),
+                    SizedBox(height: 30),
+
+                    for (int i = 0; i < exdateq.length; i++)
+                      for (String key in exdateq[i].keys)
+                        Text('${key} : ${exdateq[i][key]}',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 20)),
+
                     SizedBox(height: 30),
                     Padding(
                       padding: EdgeInsets.symmetric(
@@ -940,6 +1019,9 @@ class _AdminPostState extends State<AdminPost> {
                                 } else {
                                   print('Form is invalid');
                                 }
+                                print('9999999999');
+                                print(data);
+                                print('9999999999');
                               },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15)),

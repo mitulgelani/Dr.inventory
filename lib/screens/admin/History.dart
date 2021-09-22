@@ -25,7 +25,7 @@ class _HistoryState extends State<History> {
         .collection('history')
         .getDocuments();
     doc = result.documents;
-    print("||||||||");
+
     //  print('Doc:--${doc[1]['history']}');
     list.clear();
     for (int i = 0; i < doc.length; i++) {
@@ -35,7 +35,6 @@ class _HistoryState extends State<History> {
         tmp['quantity'] = doc[i]['history'][j]['quantity'];
         tmp['brand'] = doc[i]['history'][j]['brand'];
         tmp['date'] = doc[i]['history'][j]['date'];
-        print("tmp==$tmp");
         list.add(tmp);
       }
     }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auths/main.dart';
@@ -19,12 +20,16 @@ class BillPost extends StatefulWidget {
 class _BillPostState extends State<BillPost> {
   final List<Map<String, dynamic>> billlist;
   List<List<Map<String, dynamic>>> histortlist =
+      // ignore: deprecated_member_use
       List<List<Map<String, dynamic>>>();
   final String uid;
   String name;
   initState() {
     super.initState();
     setState(() {
+      print('/////');
+      print(billlist);
+      print('/////');
       if (billlist.length > 0) name = billlist[0]['mrname'];
     });
   }
@@ -117,45 +122,98 @@ class _BillPostState extends State<BillPost> {
                       child: RaisedButton(
                           color: Colors.green,
                           onPressed: () {
-                            setState(() {
-                              for (int i = 0; i < billlist.length; i++) {
-                                String uuid = billlist[i]['uuid'];
-                                double quantmp;
-                                double tmp =
-                                    double.parse(billlist[i]['quantity']);
-                                final Future<DocumentSnapshot> document =
-                                    Firestore.instance
-                                        .collection('users')
-                                        .document(uid)
-                                        .collection("posts")
-                                        .document(billlist[i]['uuid'])
-                                        .get();
-                                document
-                                    .then<dynamic>((DocumentSnapshot snapshot) {
-                                  quantmp =
-                                      double.parse(snapshot.data['quantity']);
-
-                                  quantmp = quantmp - tmp;
-                                  String tmp2 = quantmp.toString();
-
+                            List<List<Map<String, dynamic>>> exquan =
+                                // ignore: deprecated_member_use
+                                List<List<Map<String, dynamic>>>();
+                            for (int i = 0; i < billlist.length; i++) {
+                              final Future<DocumentSnapshot> document =
                                   Firestore.instance
-                                      .collection("users")
+                                      .collection('users')
                                       .document(uid)
                                       .collection("posts")
-                                      .document(uuid)
-                                      .updateData({'quantity': tmp2});
-                                });
+                                      .document(billlist[i]['uuid'])
+                                      .get();
+                              document
+                                  .then<dynamic>((DocumentSnapshot snapshot) {
+                                exquan.add(List.from(snapshot.data['date']));
+                              });
+                            }
+                            Timer(Duration(seconds: 3), () {
+                              print("print after every 3 seconds");
+                              print(exquan);
+                              print('hahahahahahaha');
+
+                              for (int i = 0; i < billlist.length; i++) {
+                                String uuid = billlist[i]['uuid'];
+                                print(billlist);
+                                print('^^^^^^^^^^^^^^^^^');
+
+                                double tmp =
+                                    double.parse(billlist[i]['quantity']);
+                                //   print('oo yeh : ${billlist[i]['exdate']}');
+
+                                String key = billlist[i]['exdate'];
+                                print('key : $key');
+
+                                for (int j = 0; j < exquan.length; j++) {
+                                  for (int i = 0; i < exquan[j].length; i++) {
+                                    for (var entry in exquan[j][i].entries) {
+                                      print('----%%------${exquan[j][i][key]}');
+                                      if (entry.key == key) {
+                                        double tmp2 =
+                                            double.parse(exquan[j][i][key]) -
+                                                tmp;
+                                        exquan[j][i][key] = tmp2.toString();
+
+                                        Timer(Duration(seconds: 2), () {
+                                          print('---------------');
+                                          print(exquan[j][i]);
+                                          print('---------------');
+                                          List<Map<String, dynamic>> extmp =
+                                              List<Map<String, dynamic>>();
+
+                                          for (int k = 0;
+                                              k < exquan.length;
+                                              k++) {
+                                            for (int l = 0;
+                                                l < exquan[k].length;
+                                                l++) {
+                                              for (var entry
+                                                  in exquan[k][l].entries) {
+                                                print('counter');
+                                                Map<String, dynamic> tmp =
+                                                    Map<String, dynamic>();
+                                                tmp[entry.key] = entry.value;
+                                                extmp.add(tmp);
+                                              }
+                                            }
+                                          }
+                                          print('+++++++++++++');
+                                          print(extmp);
+                                          print('+++++++++++++');
+
+                                          Firestore.instance
+                                              .collection("users")
+                                              .document(uid)
+                                              .collection("posts")
+                                              .document(uuid)
+                                              .updateData({'date': extmp});
+                                        });
+                                      }
+                                    }
+                                  }
+                                }
+                                Map<String, dynamic> histmp =
+                                    Map<String, dynamic>();
+                                histmp['history'] = billlist;
+                                Firestore.instance
+                                    .collection('users')
+                                    .document(uid)
+                                    .collection('history')
+                                    .add(histmp);
                               }
-                              Map<String, dynamic> histmp =
-                                  Map<String, dynamic>();
-                              histmp['history'] = billlist;
-                              Firestore.instance
-                                  .collection('users')
-                                  .document(uid)
-                                  .collection('history')
-                                  .add(histmp);
+                              billlist.clear();
                             });
-                            billlist.clear();
 
                             Navigator.pushReplacement(
                               context,

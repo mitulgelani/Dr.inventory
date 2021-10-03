@@ -132,7 +132,7 @@ class _HistoryState extends State<History> {
                               fontSize: 28,
                               textStyle: TextStyle(color: Colors.white)),
                         ),
-                        SizedBox(width: 200),
+                        SizedBox(width: 50),
                         Text(
                           'Quantity: ${list[index]['quantity']}',
                           style: GoogleFonts.dancingScript(

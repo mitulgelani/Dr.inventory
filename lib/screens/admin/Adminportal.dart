@@ -33,7 +33,6 @@ class _AdminPortalState extends State<AdminPortal> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String name, uid;
-  // ignore: deprecated_member_use
   List<Map<String, dynamic>> finallist = List<Map<String, dynamic>>();
   TextEditingController _searchQueryController = TextEditingController();
   TextEditingController mrname = TextEditingController();
@@ -179,7 +178,6 @@ class _AdminPortalState extends State<AdminPortal> {
         tmp['brand'] = item['brand'];
         tmp['company'] = item['company'];
         tmp['contain'] = item['contain'];
-
         tmp['date'] = item['date'];
         tmp['quantity'] = item['quantity'];
         tmp['form'] = item['form'];
@@ -234,7 +232,7 @@ class _AdminPortalState extends State<AdminPortal> {
                               Icons.person,
                               color: Colors.white,
                             ),
-                            labelText: "MR. Name",
+                            labelText: "PATIENT NAME",
                             fillColor: Colors.black,
                             border: new OutlineInputBorder(
                               borderRadius: new BorderRadius.circular(25.0),
@@ -387,6 +385,7 @@ class _AdminPortalState extends State<AdminPortal> {
 
   @override
   Widget build(BuildContext context) {
+    var constraints;
     return RefreshIndicator(
       onRefresh: () async {
         final QuerySnapshot result = await Firestore.instance
@@ -536,8 +535,7 @@ class _AdminPortalState extends State<AdminPortal> {
                   );
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 525, left: 340),
+              Container(
                 child: Tooltip(
                   message: 'add Task',
                   textStyle: TextStyle(fontSize: 15, color: Colors.white),
@@ -556,7 +554,8 @@ class _AdminPortalState extends State<AdminPortal> {
                 ),
               ),
             ],
-          ), /* ListView.builder(
+          ),
+          /* ListView.builder(
               itemCount: finallist.length,
               itemBuilder: (context, i) {
                 return finallist.length == 0
